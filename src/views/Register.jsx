@@ -39,7 +39,7 @@ const Register = () => {
 
       iniciarSesion(res.data.user);
       navigate("/profile");
-    } catch (error) {
+    } catch  {
       setError("Error al registrar. ¿Ya existe ese correo?");
     }
   };

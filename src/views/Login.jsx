@@ -20,7 +20,7 @@ function Login() {
       });
       iniciarSesion(res.data.user);
       navigate("/profile");
-    } catch (err) {
+    } catch  {
       setError("Email o contraseña incorrectos");
     }
   };
