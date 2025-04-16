@@ -7,7 +7,7 @@ import Register from "./views/Register";
 import Detalle from "./views/Detalle";
 import Publicaciones from "./views/Publicaciones";
 import FormularioPublicacion from "./components/FormularioPublicacion"; 
-import Carrito from "./views/Carrito"
+import Carrito from "./views/Carrito";
 
 function App() {
   return (
@@ -15,13 +15,14 @@ function App() {
       <Navigation />
       <main className="container mt-4">
         <Routes>
+          <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/register" element={<Register />} />
           <Route path="/detalle/:id" element={<Detalle />} />
           <Route path="/publicaciones" element={<Publicaciones />} />
-          <Route path="/publicar" element={<FormularioPublicacion />} /> 
+          <Route path="/publicar" element={<FormularioPublicacion />} />
           <Route path="/carrito" element={<Carrito />} />
         </Routes>
       </main>
@@ -30,3 +31,4 @@ function App() {
 }
 
 export default App;
+
