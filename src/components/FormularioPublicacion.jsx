@@ -1,131 +1,103 @@
-import { useState } from "react";
-import { Container, Form, Button, Alert } from "react-bootstrap";
+import { useContext, useState } from "react";
 import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
+import { Container, Form, Button, Alert, Spinner } from "react-bootstrap";
 
-const categorias = ["Cosmética", "Suplementos", "Alimentos", "Aromaterapia"];
-
-function FormularioPublicacion() {
+const FormularioPublicacion = () => {
+  const { usuario } = useContext(AuthContext);
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [precio, setPrecio] = useState("");
-  const [categoria, setCategoria] = useState(categorias[0]);
+  const [categoria, setCategoria] = useState("");
   const [imagen, setImagen] = useState(null);
-  const [error, setError] = useState("");
-
-  const handleImagenChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImagen(file);
-    }
-  };
+  const [mensaje, setMensaje] = useState("");
+  const [cargando, setCargando] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!titulo || !descripcion || !precio || !imagen) {
-      setError("Todos los campos son obligatorios.");
+    if (!usuario) {
+      setMensaje("Debes iniciar sesión para publicar.");
       return;
     }
 
-    if (isNaN(precio) || parseFloat(precio) <= 0) {
-      setError("El precio debe ser un número válido y mayor que 0.");
+    if (!titulo || !descripcion || !precio || !categoria || !imagen) {
+      setMensaje("Todos los campos son obligatorios.");
       return;
     }
 
+    const formData = new FormData();
+    formData.append("title", titulo);
+    formData.append("description", descripcion);
+    formData.append("price", precio);
+    formData.append("category_id", categoria); 
+    formData.append("user_id", usuario.id); 
+    formData.append("image", imagen);
     try {
-      const formData = new FormData();
-      formData.append("title", titulo);
-      formData.append("description", descripcion);
-      formData.append("price", precio);
-      formData.append("categoryId", categoria); 
-      formData.append("image", imagen);
+      setCargando(true);
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/publications`, formData);
+      setMensaje("✅ Publicación creada exitosamente");
+      console.log("Publicación:", res.data);
 
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/publications`, formData);
-
-      alert("¡Producto publicado con éxito! 🎉");
-
-      // Reiniciar formulario
+      // Limpiar el formulario
       setTitulo("");
       setDescripcion("");
       setPrecio("");
-      setCategoria(categorias[0]);
+      setCategoria("");
       setImagen(null);
-      setError("");
-    } catch (err) {
-      console.error("Error al publicar:", err);
-      setError("Hubo un error al intentar publicar el producto.");
+    } catch (error) {
+      console.error("Error al publicar:", error);
+      setMensaje("❌ Error al crear la publicación");
+    } finally {
+      setCargando(false);
     }
   };
 
   return (
     <Container className="mt-4">
-      <h2 className="text-center">📝 Publicar un Producto</h2>
+      <h2 className="mb-4">📢 Publicar un producto</h2>
 
-      {error && <Alert variant="danger">{error}</Alert>}
+      {mensaje && <Alert variant={mensaje.startsWith("✅") ? "success" : "danger"}>{mensaje}</Alert>}
 
       <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3">
+        <Form.Group>
           <Form.Label>Título</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Ej: Jabón Artesanal de Coco"
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
-          />
+          <Form.Control type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} required />
         </Form.Group>
 
-        <Form.Group className="mb-3">
+        <Form.Group className="mt-3">
           <Form.Label>Descripción</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            placeholder="Escribe una descripción detallada"
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-          />
+          <Form.Control as="textarea" rows={3} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required />
         </Form.Group>
 
-        <Form.Group className="mb-3">
-          <Form.Label>Precio (CLP)</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="Ej: 6000"
-            value={precio}
-            onChange={(e) => setPrecio(e.target.value)}
-          />
+        <Form.Group className="mt-3">
+          <Form.Label>Precio</Form.Label>
+          <Form.Control type="number" value={precio} onChange={(e) => setPrecio(e.target.value)} required />
         </Form.Group>
 
-        <Form.Group className="mb-3">
+        <Form.Group className="mt-3">
           <Form.Label>Categoría</Form.Label>
-          <Form.Select value={categoria} onChange={(e) => setCategoria(e.target.value)}>
-            {categorias.map((cat, index) => (
-              <option key={index} value={cat}>
-                {cat}
-              </option>
-            ))}
+          <Form.Select value={categoria} onChange={(e) => setCategoria(e.target.value)} required>
+            <option value="">Selecciona una categoría</option>
+            <option value="1">Suplementos</option>
+            <option value="2">Terapias</option>
+            <option value="3">Cosmética natural</option>
           </Form.Select>
         </Form.Group>
 
-        <Form.Group className="mb-3">
-          <Form.Label>Imagen del Producto</Form.Label>
-          <Form.Control type="file" accept="image/*" onChange={handleImagenChange} />
-          {imagen && (
-            <img
-              src={URL.createObjectURL(imagen)}
-              alt="Vista previa"
-              className="mt-3 img-fluid"
-              style={{ maxWidth: "300px" }}
-            />
-          )}
+        <Form.Group className="mt-3">
+          <Form.Label>Imagen</Form.Label>
+          <Form.Control type="file" accept="image/*" onChange={(e) => setImagen(e.target.files[0])} required />
         </Form.Group>
 
-        <Button variant="success" type="submit" className="w-100">
-          Publicar
+        <Button variant="success" type="submit" className="mt-4" disabled={cargando}>
+          {cargando ? <Spinner animation="border" size="sm" /> : "Publicar"}
         </Button>
       </Form>
     </Container>
   );
-}
+};
 
 export default FormularioPublicacion;
+
 
