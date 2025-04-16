@@ -1,6 +1,8 @@
 import { useContext, useState } from "react";
 import { CarritoContext } from "../context/CarritoContext";
 import { Container, ListGroup, Button, Alert, Image } from "react-bootstrap";
+import { Link } from "react-router-dom";
+
 
 const Carrito = () => {
   const { carrito, agregarAlCarrito, restarDelCarrito, eliminarDelCarrito } = useContext(CarritoContext);
@@ -47,9 +49,16 @@ const Carrito = () => {
           </ListGroup>
 
           <div className="text-end mt-4">
-            <h4>Total a pagar: <strong>${total}</strong></h4>
-            <Button variant="success" onClick={confirmarCompra} className="mt-2">Confirmar Compra</Button>
-          </div>
+  <h4>Total a pagar: <strong>${total}</strong></h4>
+  <Button variant="success" onClick={confirmarCompra} className="mt-2 me-2">
+    Confirmar Compra
+  </Button>
+  <Button as={Link} to="/publicaciones" variant="outline-secondary" className="mt-2">
+    Seguir comprando
+  </Button>
+</div>
+
+          
         </>
       )}
     </Container>
