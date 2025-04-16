@@ -82,7 +82,7 @@ const FormularioPublicacion = () => {
             <option value="1">Suplementos</option>
             <option value="2">Aromaterapia</option>
             <option value="3">Cosmética natural</option>
-            <option value="3">Alimentos</option>
+            <option value="4">Alimentos</option>
           </Form.Select>
         </Form.Group>
 
