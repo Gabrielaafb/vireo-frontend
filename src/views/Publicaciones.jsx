@@ -20,6 +20,22 @@ const productosEjemplo = [
     image: "https://organicplace.cl/wp-content/uploads/2024/03/SSC_A-scaled.webp",
     categoria: "Cosmética",
   },
+  {
+    id: 1003,
+    title: "Infusión Relajante de Hierbas",
+    description: "Calma el estrés y promueve el equilibrio emocional.",
+    price: 4500,
+    image: "https://www.blendsandtea.cl/cdn/shop/files/rec-azul_026ab8d5-1076-4f74-9958-f6aaa70a4340_2048x.jpg?v=1724432723",
+    categoria: "Suplementos",
+  },
+  {
+    id: 1004,
+    title: "Detergente Newen orgánico 1 Litro",
+    description: "Limpieza amigable con el planeta y con tu salud.",
+    price: 6000,
+    image: "https://newen.mx/wp-content/uploads/2020/04/newen-detergente-sustentable-para-ropa-1-litro-00-01.png",
+    categoria: "Cosmetica",
+  }
 ];
 
 const mapCategoryIdToNombre = {
@@ -33,6 +49,7 @@ const categoriasDisponibles = ["Todas", "Cosmética", "Suplementos", "Aromaterap
 
 const Publicaciones = () => {
   const [publicaciones, setPublicaciones] = useState([]);
+  const [cantidades, setCantidades] = useState({});
   const [filtroCategoria, setFiltroCategoria] = useState("Todas");
   const [ordenPrecio, setOrdenPrecio] = useState("default");
   const [loading, setLoading] = useState(true);
@@ -48,6 +65,9 @@ const Publicaciones = () => {
       }));
       const combinadas = [...backendPublicaciones, ...productosEjemplo];
       setPublicaciones(combinadas);
+      const cantidadesIniciales = {};
+      combinadas.forEach((p) => (cantidadesIniciales[p.id] = 1));
+      setCantidades(cantidadesIniciales);
     } catch (error) {
       console.error("🛑 Error al cargar publicaciones:", error);
       setPublicaciones(productosEjemplo);
@@ -60,15 +80,20 @@ const Publicaciones = () => {
     fetchPublicaciones();
   }, []);
 
-  const eliminarPublicacion = async (id) => {
-    try {
-      const confirm = window.confirm("¿Estás segura de que quieres borrar esta publicación?");
-      if (!confirm) return;
+  const cambiarCantidad = (id, delta) => {
+    setCantidades((prev) => ({
+      ...prev,
+      [id]: Math.max(1, (prev[id] || 1) + delta),
+    }));
+  };
 
+  const eliminarPublicacion = async (id) => {
+    const confirm = window.confirm("¿Estás segura de que quieres borrar esta publicación?");
+    if (!confirm) return;
+    try {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/publications/${id}`, {
         method: "DELETE",
       });
-
       if (res.ok) {
         setPublicaciones(publicaciones.filter((p) => p.id !== id));
         alert("✅ Publicación eliminada");
@@ -104,7 +129,6 @@ const Publicaciones = () => {
               </Form.Select>
             </Form.Group>
           </Col>
-
           <Col md={6}>
             <Form.Group>
               <Form.Label><strong>Ordenar por precio:</strong></Form.Label>
@@ -123,7 +147,7 @@ const Publicaciones = () => {
           <Row>
             {publicacionesFiltradas.map((pub) => (
               <Col key={pub.id} sm={6} md={4} lg={3} className="mb-4">
-                <Card className="h-100 shadow-sm">
+                <Card className="h-100 shadow-sm d-flex flex-column">
                   <Card.Img
                     variant="top"
                     src={pub.image}
@@ -134,18 +158,22 @@ const Publicaciones = () => {
                       <Card.Title>{pub.title}</Card.Title>
                       <Card.Text>Precio: ${pub.price}</Card.Text>
                     </div>
-                    <div className="mt-2 d-grid gap-2">
+                    <div className="d-flex justify-content-center align-items-center mb-2">
+                      <Button variant="outline-secondary" size="sm" onClick={() => cambiarCantidad(pub.id, -1)}>-</Button>
+                      <span className="mx-2">{cantidades[pub.id]}</span>
+                      <Button variant="outline-secondary" size="sm" onClick={() => cambiarCantidad(pub.id, 1)}>+</Button>
+                    </div>
+                    <div className="d-grid gap-2">
                       <Link to={`/detalle/${pub.id}`} className="btn btn-outline-success btn-sm">
                         Ver Detalles
                       </Link>
                       <Button
                         variant="success"
                         size="sm"
-                        onClick={() => agregarAlCarrito({ ...pub, cantidad: 1 })}
+                        onClick={() => agregarAlCarrito({ ...pub, cantidad: cantidades[pub.id] })}
                       >
                         🛒 Agregar al carrito
                       </Button>
-                      {/* Solo borrar si es publicación real del backend */}
                       {pub.id < 1000 && (
                         <Button
                           variant="danger"
@@ -164,7 +192,7 @@ const Publicaciones = () => {
         )}
       </Container>
 
-      <footer className="bg-success text-white text-center py-3 mt-5">
+      <footer className="bg-success text-white text-center py-3 mt-5 w-100">
         <Container>
           <p>© {new Date().getFullYear()} Vireo - Marketplace de productos naturales 🌿</p>
         </Container>
