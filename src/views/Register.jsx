@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Container, Form, Button, Alert } from "react-bootstrap";
+import axios from "axios";
 
 const Register = () => {
   const { iniciarSesion } = useContext(AuthContext);
@@ -20,7 +21,7 @@ const Register = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (form.password !== form.confirmPassword) {
@@ -28,9 +29,19 @@ const Register = () => {
       return;
     }
 
-    setError("");
-    iniciarSesion({ nombre: form.nombre, email: form.email });
-    navigate("/profile"); 
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/users/register`, {
+        name: form.nombre,
+        email: form.email,
+        password: form.password,
+        image: "https://via.placeholder.com/150",
+      });
+
+      iniciarSesion(res.data.user);
+      navigate("/profile");
+    } catch (error) {
+      setError("Error al registrar. ¿Ya existe ese correo?");
+    }
   };
 
   return (

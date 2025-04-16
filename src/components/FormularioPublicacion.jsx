@@ -37,7 +37,7 @@ function FormularioPublicacion() {
       formData.append("title", titulo);
       formData.append("description", descripcion);
       formData.append("price", precio);
-      formData.append("category", categoria);
+      formData.append("categoryId", categoria); 
       formData.append("image", imagen);
 
       await axios.post(`${import.meta.env.VITE_BACKEND_URL}/publications`, formData);
