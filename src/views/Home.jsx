@@ -29,9 +29,6 @@ const productosEjemplo = [
   },
 ];
 
-
-const categorias = ["Cosmética", "Suplementos", "Alimentos", "Aromaterapia"];
-
 function Home() {
   return (
     <Container className="mt-4">
@@ -73,6 +70,7 @@ function Home() {
           </Col>
         ))}
       </Row>
+
 
       <footer className="bg-success text-white text-center py-3 mt-5">
         <Container>

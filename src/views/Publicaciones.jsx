@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import { Container, Row, Col, Card,Spinner } from "react-bootstrap";
+import { useEffect, useState, useContext } from "react";
+import { Container, Row, Col, Card, Spinner, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { CarritoContext } from "../context/CarritoContext";
 
 const productosEjemplo = [
   {
@@ -21,10 +22,10 @@ const productosEjemplo = [
   },
   {
     id: 1003,
-    tittle: "Infusión Relajante de Hierbas",
-    descripcion: "Mezcla especial para calmar el estrés y promover el equilibrio emocional.",
+    title: "Infusión Relajante de Hierbas",
+    description: "Mezcla especial para calmar el estrés y promover el equilibrio emocional.",
     price: 4500,
-    imagen: "https://www.blendsandtea.cl/cdn/shop/files/rec-azul_026ab8d5-1076-4f74-9958-f6aaa70a4340_2048x.jpg?v=1724432723",
+    image: "https://www.blendsandtea.cl/cdn/shop/files/rec-azul_026ab8d5-1076-4f74-9958-f6aaa70a4340_2048x.jpg?v=1724432723",
     category_id: 4,
   },
 ];
@@ -32,6 +33,7 @@ const productosEjemplo = [
 const Publicaciones = () => {
   const [publicaciones, setPublicaciones] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { agregarAlCarrito } = useContext(CarritoContext);
 
   const fetchPublicaciones = async () => {
     try {
@@ -41,7 +43,7 @@ const Publicaciones = () => {
       setPublicaciones(combinadas);
     } catch (error) {
       console.error("🛑 Error al cargar publicaciones:", error);
-      setPublicaciones(productosEjemplo); // fallback solo ejemplo
+      setPublicaciones(productosEjemplo);
     } finally {
       setLoading(false);
     }
@@ -55,19 +57,29 @@ const Publicaciones = () => {
     <Container className="mt-4">
       <h2>🌿 Publicaciones Disponibles</h2>
       {loading ? (
-        <Spinner animation="border" />
+        <div className="text-center"><Spinner animation="border" /></div>
       ) : (
         <Row>
           {publicaciones.map((pub) => (
             <Col key={pub.id} sm={6} md={4} lg={3} className="mb-4">
-              <Card>
-                <Card.Img variant="top" src={pub.image} />
-                <Card.Body>
+              <Card className="h-100">
+                <Card.Img
+                  variant="top"
+                  src={pub.image}
+                  alt={pub.title}
+                  style={{ height: "200px", objectFit: "cover" }}
+                />
+                <Card.Body className="d-flex flex-column">
                   <Card.Title>{pub.title}</Card.Title>
                   <Card.Text>Precio: ${pub.price}</Card.Text>
-                  <Link to={`/detalle/${pub.id}`} className="btn btn-outline-success">
-                    Ver Detalles
-                  </Link>
+                  <div className="mt-auto d-grid gap-2">
+                    <Link to={`/detalle/${pub.id}`} className="btn btn-outline-success">
+                      Ver Detalles
+                    </Link>
+                    <Button variant="success" onClick={() => agregarAlCarrito(pub)}>
+                      🛒 Agregar al carrito
+                    </Button>
+                  </div>
                 </Card.Body>
               </Card>
             </Col>
