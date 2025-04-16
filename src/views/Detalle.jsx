@@ -3,7 +3,7 @@ import { useEffect, useState, useContext } from "react";
 import { Container, Card, Button, Spinner } from "react-bootstrap";
 import { CarritoContext } from "../context/CarritoContext";
 
-// Productos de ejemplo por si no existe en backend
+// Productos de respaldo si no están en el backend
 const productosEjemplo = [
   {
     id: 1001,
@@ -39,15 +39,14 @@ const Detalle = () => {
   const { id } = useParams();
   const { agregarAlCarrito } = useContext(CarritoContext);
   const [producto, setProducto] = useState(null);
-  const [cantidad, setCantidad] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [cantidad, setCantidad] = useState(1);
 
   useEffect(() => {
     const obtenerProducto = async () => {
       try {
         const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/publications`);
         const data = await res.json();
-
         const allProducts = [...data, ...productosEjemplo];
         const encontrado = allProducts.find((p) => p.id === parseInt(id));
         setProducto(encontrado);
@@ -61,66 +60,59 @@ const Detalle = () => {
     obtenerProducto();
   }, [id]);
 
-  const aumentarCantidad = () => setCantidad((prev) => prev + 1);
-  const disminuirCantidad = () => setCantidad((prev) => (prev > 1 ? prev - 1 : 1));
-
-  const handleAgregar = () => {
-    agregarAlCarrito({ ...producto, cantidad });
-  };
-
   if (loading) return <div className="text-center"><Spinner animation="border" /></div>;
   if (!producto) return <h2 className="text-center">Producto no encontrado</h2>;
 
   return (
-    <Container className="mt-4">
-      <Card className="text-center shadow" style={{ maxWidth: "600px", margin: "0 auto" }}>
-        <Card.Img
-          variant="top"
-          src={producto.image}
-          alt={producto.title}
-          style={{ height: "400px", objectFit: "contain", padding: "10px" }}
-        />
-        <Card.Body>
-          <Card.Title className="fw-bold">{producto.title}</Card.Title>
-          <Card.Text className="text-muted mb-2">{producto.description}</Card.Text>
-          <Card.Text><strong>Precio:</strong> ${producto.price}</Card.Text>
+    <>
+      <Container className="mt-4">
+        <Card className="shadow text-center" style={{ maxWidth: "600px", margin: "0 auto" }}>
+          <Card.Img
+            variant="top"
+            src={producto.image}
+            alt={producto.title}
+            style={{ maxHeight: "400px", objectFit: "contain", backgroundColor: "#f8f8f8" }}
+          />
+          <Card.Body>
+            <Card.Title className="fw-bold">{producto.title}</Card.Title>
+            <Card.Text className="text-muted">{producto.description}</Card.Text>
+            <Card.Text><strong>Precio:</strong> ${producto.price}</Card.Text>
 
-          <div className="d-flex justify-content-center align-items-center gap-2 mb-3">
-            <Button variant="outline-secondary" size="sm" onClick={disminuirCantidad}>−</Button>
-            <span><strong>{cantidad}</strong></span>
-            <Button variant="outline-secondary" size="sm" onClick={aumentarCantidad}>＋</Button>
-          </div>
+            <div className="d-flex justify-content-center align-items-center mb-3">
+              <Button variant="outline-secondary" size="sm" onClick={() => setCantidad(prev => Math.max(1, prev - 1))}>−</Button>
+              <span className="mx-3">{cantidad}</span>
+              <Button variant="outline-secondary" size="sm" onClick={() => setCantidad(prev => prev + 1)}>+</Button>
+            </div>
 
-          <div className="d-flex justify-content-center gap-2 mt-3">
-            <Button
-              variant="success"
-              size="sm"
-              onClick={handleAgregar}
-            >
-              🛒 Agregar al Carrito
-            </Button>
-
-            <a
-              href={`mailto:contacto@vireo.cl?subject=Consulta por ${producto.title}`}
-              className="btn btn-outline-primary btn-sm"
-            >
-              ✉️ Contactar al Vendedor
-            </a>
-          </div>
-        </Card.Body>
-      </Card>
+            <div className="d-flex justify-content-center gap-2 flex-wrap">
+              <Button
+                variant="success"
+                size="sm"
+                onClick={() => agregarAlCarrito({ ...producto, cantidad })}
+              >
+                🛒 Agregar al Carrito
+              </Button>
+              <a
+                href={`mailto:contacto@vireo.cl?subject=Consulta por ${producto.title}`}
+                className="btn btn-outline-primary btn-sm"
+              >
+                ✉️ Contactar al Vendedor
+              </a>
+            </div>
+          </Card.Body>
+        </Card>
+      </Container>
 
       <footer className="bg-success text-white text-center py-3 mt-5 w-100">
         <Container>
-          <p className="mb-0">
-            © {new Date().getFullYear()} Vireo — Marketplace de productos naturales 🌿
-          </p>
+          <p>© {new Date().getFullYear()} Vireo - Marketplace de productos naturales 🌿</p>
         </Container>
       </footer>
-    </Container>
+    </>
   );
 };
 
 export default Detalle;
+
 
 

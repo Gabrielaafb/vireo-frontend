@@ -80,8 +80,9 @@ const FormularioPublicacion = () => {
           <Form.Select value={categoria} onChange={(e) => setCategoria(e.target.value)} required>
             <option value="">Selecciona una categoría</option>
             <option value="1">Suplementos</option>
-            <option value="2">Terapias</option>
+            <option value="2">Aromaterapia</option>
             <option value="3">Cosmética natural</option>
+            <option value="3">Alimentos</option>
           </Form.Select>
         </Form.Group>
 

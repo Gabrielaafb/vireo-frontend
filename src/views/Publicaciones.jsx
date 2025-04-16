@@ -34,12 +34,12 @@ const productosEjemplo = [
     description: "Limpieza amigable con el planeta y con tu salud.",
     price: 6000,
     image: "https://newen.mx/wp-content/uploads/2020/04/newen-detergente-sustentable-para-ropa-1-litro-00-01.png",
-    categoria: "Cosmetica",
+    categoria: "Cosmética",
   }
 ];
 
 const mapCategoryIdToNombre = {
-  1: "Cosmética",
+  1: "Cosmética Natural",
   2: "Suplementos",
   3: "Aromaterapia",
   4: "Alimentos",
@@ -88,12 +88,14 @@ const Publicaciones = () => {
   };
 
   const eliminarPublicacion = async (id) => {
-    const confirm = window.confirm("¿Estás segura de que quieres borrar esta publicación?");
-    if (!confirm) return;
     try {
+      const confirm = window.confirm("¿Estás segura de que quieres borrar esta publicación?");
+      if (!confirm) return;
+
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/publications/${id}`, {
         method: "DELETE",
       });
+
       if (res.ok) {
         setPublicaciones(publicaciones.filter((p) => p.id !== id));
         alert("✅ Publicación eliminada");
@@ -159,7 +161,7 @@ const Publicaciones = () => {
                       <Card.Text>Precio: ${pub.price}</Card.Text>
                     </div>
                     <div className="d-flex justify-content-center align-items-center mb-2">
-                      <Button variant="outline-secondary" size="sm" onClick={() => cambiarCantidad(pub.id, -1)}>-</Button>
+                      <Button variant="outline-secondary" size="sm" onClick={() => cambiarCantidad(pub.id, -1)}>−</Button>
                       <span className="mx-2">{cantidades[pub.id]}</span>
                       <Button variant="outline-secondary" size="sm" onClick={() => cambiarCantidad(pub.id, 1)}>+</Button>
                     </div>
@@ -202,5 +204,6 @@ const Publicaciones = () => {
 };
 
 export default Publicaciones;
+
 
 
