@@ -74,20 +74,6 @@ function Home() {
         ))}
       </Row>
 
-      <h2 className="text-center my-4"> Categorías Destacadas</h2>
-      <Row className="text-center">
-        {categorias.map((categoria, index) => (
-          <Col md={3} key={index}>
-            <Card className="p-3 shadow-sm">
-              <Card.Body>
-                <Card.Title>{categoria}</Card.Title>
-                <Button variant="outline-success">Explorar</Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-
       <footer className="bg-success text-white text-center py-3 mt-5">
         <Container>
           <p>© {new Date().getFullYear()} Vireo - Marketplace de productos naturales 🌿</p>

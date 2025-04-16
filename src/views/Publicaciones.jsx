@@ -25,7 +25,7 @@ const productosEjemplo = [
     descripcion: "Mezcla especial para calmar el estrés y promover el equilibrio emocional.",
     price: 4500,
     imagen: "https://www.blendsandtea.cl/cdn/shop/files/rec-azul_026ab8d5-1076-4f74-9958-f6aaa70a4340_2048x.jpg?v=1724432723",
-   
+    category_id: 4,
   },
 ];
 
